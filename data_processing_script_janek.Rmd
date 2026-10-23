@@ -6,6 +6,8 @@ output:
   html_document:
     toc: true
     toc_depth: 2
+editor_options: 
+  chunk_output_type: console
 ---
 
 Goal for this file:
@@ -262,12 +264,9 @@ Physical attractiveness (scale = 11 point rating)
 
 # make h1_data with "id", "cot_politics", "self_physatt"
 
-# I choose to keep all NA in for now.
-
-h1_data <- data[c("id", "cot_politics", "self_physatt")]
 
 # code to remove all rows with NAs
-# h1_data <- na.omit(data[c("id", "cot_politics", "self_physatt")])
+h1_data <- na.omit(data[c("id", "cot_politics", "self_physatt")])
 
 
 # plot
@@ -286,13 +285,10 @@ Daily time spent enhancing appearance  (composite variable, sum of 8 scales)
 
 ```{r h2 data frame}
 
-h2_data <- data[c("id", "attract_importance_1", "app_enh_total")]
-
 # code to remove all rows with NAs
-# h2_data <- na.omit(data[c("id", "attract_importance_1", "app_enh_total")])
+h2_data <- na.omit(data[c("id", "attract_importance_1", "app_enh_total")])
 
 
-# I choose to keep all NA in for now.
 
 # plot
 boxplot(app_enh_total ~ attract_importance_1, data = h2_data)

@@ -1,0 +1,151 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+H1 One categorical IV – continuous DV prediction
+
+Political beliefs (cat = left to right in 5 steps) 
+effect on 
+Physical attractiveness (scale = 11 point rating) 
+
+H2 One continuous-continuous prediction
+
+Importance of looking attractive (Attract_importance_1, scale 1-9)
+positive effect on
+Daily time spent enhancing appearance  (composite variable, sum of 8 scales)
+
+```{r}
+
+library(ggplot2)
+library(ggrain)
+library(reshape2)
+
+```
+
+
+Load data
+```{r}
+
+#load processed data
+h1 <- read.csv("data/processed_data/practice_h1.csv")
+h2 <- read.csv("data/processed_data/practice_h2.csv")
+
+
+colnames(h1)
+table(h1$cot_politics)
+
+h1$cot_politics <- factor(h1$cot_politics,
+                       levels = c("far_left","center_left","center","center_right","far_right"))
+
+
+```
+
+Plot h1 box
+
+```{r}
+
+h1_box <- ggplot(data = h1, 
+                  aes(x = cot_politics,
+                      y = self_physatt,
+                      fill = cot_politics)) +
+  geom_boxplot(width = .4) + 
+    labs(x = "Political Beliefs", 
+       y = "(Self reported) Physical Attractiveness Scale",, 
+       title = "Self Reported Physical Attractiveness and Political Beliefs") +
+       scale_x_discrete(labels = 
+                          c("Far Left", "Center Left", "Center", "Center Right", "Far Right", "NA")) +
+  guides(fill = "none") 
+
+h1_box
+
+```
+
+Plot 1 violin
+
+```{r}
+
+h1_violin <- ggplot(data = h1, 
+                  aes(x = cot_politics,
+                      y = self_physatt,
+                      fill = cot_politics)) +
+    geom_violin() +
+    labs(x = "Self", 
+       y = "Points allocated to PPA", 
+       title = "Partner Physical Attractivness (PPA) by Sex") +
+  guides(fill = "none")+
+  theme_gray(base_size = 8) +
+  geom_boxplot(width=.12)
+
+h1_violin
+```
+
+
+
+Plot 1 raincloud
+
+```{r}
+
+h1_raincloud <- ggplot(data = h1, 
+                  aes(x = cot_politics,
+                      y = self_physatt,
+                      fill = cot_politics)) +
+  geom_rain(alpha=.5,likert=T, point.args = list(size = 0.1)) +
+    labs(x = "Sex assigned at birth", 
+       y = "Points allocated to PPA", 
+       title = "Partner Physical Attractivness (PPA) by Sex") +
+  guides(fill = "none")+
+  theme_gray(base_size = 8)
+
+h1_raincloud
+
+```
+
+
+##
+
+H2 One continuous-continuous prediction
+
+Importance of looking attractive (Attract_importance_1, scale 1-9)
+positive effect on
+Daily time spent enhancing appearance  (composite variable, sum of 8 scales)
+
+
+##
+Plots
+
+```{r}
+
+#Scatter Plot with line
+h2_line <- ggplot(data = h2, 
+                  aes(x = attract_importance_1,
+                      y = app_enh_total)) +
+                         geom_jitter(width=.12, height=.1, alpha=.08, size = .6)  +
+        labs(x = "Reported Importance Of Own Attractivness", 
+       y = "Composite Score of Daily Time Spent Enhancing Appearance (min)", 
+       title = "Time Spent Enhancing Appearance in Relation to Importance of Appearance") +
+  geom_smooth(method="lm")
+
+h2_line
+
+
+
+```
+
+
+Save my figures
+
+```{r}
+
+#Run after creating the plots. Save PNG files in the project's figures folder.
+
+dir.create("figures", showWarnings = F)
+
+ggsave(plot = h1_box, "figures/h1_box.png", width = 10, height = 6, dpi = 300)
+
+ggsave(plot = h2_line, "figures/h2_line.png", width = 10, height = 6, dpi = 300)
+
+```
+
+
