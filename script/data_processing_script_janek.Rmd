@@ -180,6 +180,18 @@ summary(data$time_a_diet_1)
 # all looks good
                
 # create a vector with names of columns
+
+###JK: Diet is listed twice, and the other-activities item is missing. ###
+# Replace the variable list below with the eight different items:
+# app_enh_vars <- c(
+#   "time_a_makeup_1", "time_a_hyg_1", "time_a_cosm_1",
+#   "time_a_exercise_1", "time_a_hair_1", "time_a_dress_1",
+#   "time_a_diet_1", "time_a_other_1"
+# )
+# Also replace the repeated summary(data$time_a_diet_1) above with summary(data$time_a_other_1).
+# After correcting the list, rerun the calculations and update the row counts in your comments.
+###  End of comment ###
+
 app_enh_vars <- c("time_a_makeup_1","time_a_hyg_1","time_a_cosm_1",
                   "time_a_exercise_1", "time_a_hair_1","time_a_dress_1",
                   "time_a_diet_1", "time_a_diet_1")
@@ -188,6 +200,15 @@ app_enh_vars <- c("time_a_makeup_1","time_a_hyg_1","time_a_cosm_1",
 #see summary of variables
 # give that vector to df and ask for summary of those values
 summary(data[,app_enh_vars])
+
+###JK: Use the item names for these checks rather than columns 4:11. ###
+# Columns 4:11 include self_physatt and leave out time_a_other_1, so they are not the eight time items.
+# The named checks already above and below are the appropriate ones once app_enh_vars is corrected:
+# summary(data[, app_enh_vars])
+# colSums(is.na(data[, app_enh_vars]))
+# You can remove the below check using 4:11.
+###  End of comment ###
+
 # alternative
 summary(data[,4:11])
 
@@ -207,6 +228,19 @@ sum(is.na(data$app_enh_total))
 # count NOT NA values 
 sum(!is.na(data$app_enh_total))
 # 7753
+
+###JK: I agree that missing responses should not automatically become zero, but partial sums still need careful interpretation. ###
+# Someone reporting 30 minutes on one activity and leaving the rest blank gets the same score as someone reporting a total of 30 minutes across all eight activities.
+# We do not know how much time the first person spent on the unanswered activities, so those scores do not describe the same amount of information.
+# Your later code correctly returns NA when every item is missing, but it still sums different numbers of answered items for other participants.
+# After correcting app_enh_vars, check how many items each person answered:
+# data$app_enh_answered <- rowSums(!is.na(data[, app_enh_vars]))
+# table(data$app_enh_answered)
+# One straightforward option is to require all eight items:
+# data$app_enh_total <- rowSums(data[, app_enh_vars], na.rm = FALSE)
+# If you choose that option, replace the later na.rm=TRUE calculations and mutate() block so they do not overwrite this score.
+# If you keep partial sums instead, explain that they are sums of reported activities, not necessarily total daily appearance time, and state this rule in the codebook.
+###  End of comment ###
 
 # since my composite score, I choose to calculate with na.rm=T - leaving my sum scores intact, even if there are NAs in the variables.
 # We are counting sum of time here, and if someone does not report for a single time scale, I still want to consider the sum time.
@@ -335,6 +369,14 @@ var_label(h1_data) <- c(
 
 #add a description to each h2_data column, in column order
 #include response anchors and the commitment scoring rule
+###JK: Update the appearance-time description to match your corrected items and chosen missing-data rule. ###
+# The current description repeats diet and leaves out other activities, just like the item list above.
+# You can replace the label for app_enh_total with the following description, then add one of the missing-data sentences below to that same label:
+# "Sum of reported time on makeup, hygiene, cosmetics, exercise, hair, dress, diet, and other appearance activities, in minutes. Each item uses 360 to represent six hours or more."
+# If requiring all eight items: "All eight responses are required; if any item is missing, the score is NA."
+# If keeping partial sums: "Available responses are summed; if all eight items are missing, the score is NA. Scores may be based on different numbers of answered items."
+###  End of comment ###
+
 var_label(h2_data) <- c(
   "id: Unique participant ID",
   "attract_importance_1: Self reported importance of own attractivness: scale from 1-9 (1 - not at all important - 9 - extremely important)",
