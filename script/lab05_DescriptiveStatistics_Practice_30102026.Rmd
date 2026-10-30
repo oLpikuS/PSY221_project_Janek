@@ -1,0 +1,158 @@
+---
+title: "PSY221A: Descriptive Statistics"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## 1. Load the processed data
+
+```{r load}
+# Open the project's .Rproj file before running chunks.
+# Install psych once in the Console if needed: install.packages("psych")
+
+install.packages("psych")
+library(psych)
+
+h1 <- read.csv("data/processed_data/practice_h1.csv")
+h2 <- read.csv("data/processed_data/practice_h2.csv")
+
+```
+
+## 2. Look at the distribution first
+
+```{r histogram}
+# A histogram groups numerical values into intervals (bins).
+# Bar height shows how many observations fall in each interval.
+# Start by looking at the distribution before calculating summary statistics.
+
+hist(h1$self_physatt)
+# hist(h1$cot_politics) # does not work because categoric variable
+hist(h2$attract_importance_1)
+hist(h2$app_enh_total)
+
+
+# Add readable labels to histograms.
+hist(h1$self_physatt,
+     main = "Distribution of Physical Attractivness",
+     xlab = "Self-Rated Physical Attractivness (1-10)")
+
+hist(h2$attract_importance_1,
+     main = "Distribution of Importance of Own Attractivness",
+     xlab = "Self-Rated of Importance of Own Attractivness (1-9)")
+
+hist(h2$app_enh_total,
+     main = "Time Spent Enhancing Appearance",
+     xlab = "Sum of Composite measure of Enhancing Own Appearance (in min)")
+
+```
+
+## 3. One statistic at a time
+
+```{r individual_statistics}
+# Mean: add the scores and divide by the number of observed responses.
+sum(is.na(h1$self_physatt)) # 0
+sum(is.na(h1$cot_politics)) # 0
+sum(is.na(h2$attract_importance_1)) # 0
+sum(is.na(h2$app_enh_total)) # 0
+# no NAs in all our data
+mean(h1$self_physatt) # 6.777964
+mean(h2$attract_importance_1) # 7.384656
+mean(h2$app_enh_total) # 574.458
+
+# Median: the middle score after sorting the responses.
+median(h1$self_physatt) # 6
+median(h2$attract_importance_1) # 7
+median(h2$app_enh_total) # 420
+
+# Table: count how many people are in each category.
+table(h1$cot_politics)
+#      center  center_left center_right     far_left    far_right 
+#      34842        26063        11848         8083         2308 
+
+# Range: return the minimum and maximum, rather than their difference.
+range(h1$self_physatt) # 1 11
+range(h2$attract_importance_1) # 1 9
+range(h2$app_enh_total) # 0 2880
+
+# IQR: the 75th percentile minus the 25th percentile.
+IQR(h1$self_physatt) # 2
+IQR(h2$attract_importance_1) # 2
+IQR(h2$app_enh_total) # 291
+
+```
+
+## 4. Standardize a variable
+
+```{r standardize}
+# scale() uses z = (original score - mean) / standard deviation by default.
+# Keep the original commitment scores and store the standardized values separately.
+# scale() returns a matrix; as.numeric() makes a simple numeric column.
+
+h1$self_physatt_z <- scale(h1$self_physatt) 
+h2$attract_importance_1_z <- scale(h2$attract_importance_1)
+h2$app_enh_total_z <- scale(h2$app_enh_total) 
+
+# Standardized scores have mean approximately 0 and standard deviation 1.
+round(mean(h1$self_physatt_z), digits = 5) # 0
+round(mean(h2$attract_importance_1_z), digits = 5) # 0
+round(mean(h2$app_enh_total_z), digits = 5) # 0
+
+round(sd(h1$self_physatt_z), digits = 5) # 1
+round(sd(h2$attract_importance_1_z), digits = 5) # 1
+round(sd(h2$app_enh_total_z), digits = 5) # 1
+
+# show hist
+hist(h1$self_physatt_z)
+hist(h2$attract_importance_1_z)
+hist(h2$app_enh_total_z)
+
+```
+
+## 5. Covariance and correlation
+
+```{r association}
+# Covariance describes whether two variables tend to move together.
+# Positive: higher values tend to occur together. Negative: higher values tend to accompany lower values.
+# Its size depends on the units and is not restricted to -1 through 1.
+cov(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
+# use = "complete.obs" - only use when complete observations in both variables
+# 96.68606
+
+# Pearson correlation expresses a linear association on a -1 to 1 scale.
+cor(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
+# 0.1288774
+# slight positive associaton
+
+# Select numerical variables only; do not include participant IDs or category codes.
+cor_data <- h2[,c("attract_importance_1","app_enh_total")]
+
+# A correlation matrix gives the correlation for each pair of columns.
+# The diagonal is 1 because each variable is correlated with itself.
+cor(cor_data, use = "complete.obs")
+#                      attract_importance_1 app_enh_total
+# attract_importance_1            1.0000000     0.1288774
+# app_enh_total                   0.1288774     1.0000000
+
+cor(h2[,c("attract_importance_1","app_enh_total")], use = "complete.obs")
+# this works too without creating another df
+#                      attract_importance_1 app_enh_total
+# attract_importance_1            1.0000000     0.1288774
+# app_enh_total                   0.1288774     1.0000000
+
+```
+
+## 6. Several statistics at once
+
+```{r combined_summaries}
+# summary() reports minimum, quartiles, median, mean, maximum, and missing counts when present.
+summary(h1)
+summary(h2)
+
+# psych::describe() reports n, mean, SD, median, minimum, maximum, range width (max minus min), skewness, kurtosis, and other summaries.
+psych::describe(h1)
+psych::describe(h2)
+
+# However it does not report every statistic above: compute IQR, cov(), and cor() separately.
+```
+
