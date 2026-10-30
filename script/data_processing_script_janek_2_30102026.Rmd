@@ -1,0 +1,385 @@
+---
+title: 'PSY221A: Data Validation and Wrangling'
+author: "Janek Stahlberg"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+editor_options: 
+  chunk_output_type: console
+---
+
+Goal for this file:
+
+- Your hypotheses.
+- The variables you plan to use.
+- Code to create a tidy dataset.
+- Code to create a codebook.
+
+
+1. My Hypotheses
+
+H1 One categorical IV – continuous DV prediction
+
+Political beliefs (cat = left to right in 5 steps) 
+effect on 
+Physical attractiveness (scale = 11 point rating) 
+
+H2 One continuous-continuous prediction
+
+Importance of looking attractive (Attract_importance_1, scale 1-9)
+positive effect on
+Daily time spent enhancing appearance  (composite variable, sum of 8 scales)
+
+
+
+```{r packages}
+
+# load packages
+
+library(codebook)
+library(dplyr)
+
+```
+
+## 1. Create subset
+
+```{r data}
+
+#load data/raw/data_doctored.csv
+raw <- read.csv("data/lab02_files/data_doctored.csv")
+
+summary(raw)
+
+# Attract_importance_1
+
+
+#make data with ID, cot_politics, self_physatt, Time_A_makeup_1, Time_A_hyg_1, Time_A_cosm_1, Time_A_exercise_1, Time_A_hair_1, Time_A_dress_1, Time_A_diet_1, Time_A_other_1
+
+
+# create subset
+# manually choose columns, check colnames or str
+data <- raw[,c("ResponseId", "Attract_importance_1", "cot_politics", "self_physatt",
+               "Time_A_makeup_1","Time_A_hyg_1","Time_A_cosm_1",
+               "Time_A_exercise_1", "Time_A_hair_1","Time_A_dress_1",
+               "Time_A_diet_1", "Time_A_other_1")]
+
+
+# rename columns, because capitalized letters in dataframes suck
+data <- data %>% 
+  rename(
+    id = ResponseId,
+    attract_importance_1 = Attract_importance_1,
+    cot_politics = cot_politics,
+    self_physatt = self_physatt, 
+    time_a_makeup_1 = Time_A_makeup_1,
+    time_a_hyg_1 = Time_A_hyg_1,
+    time_a_cosm_1 = Time_A_cosm_1,
+    time_a_exercise_1 = Time_A_exercise_1,
+    time_a_hair_1 = Time_A_hair_1, 
+    time_a_dress_1 = Time_A_dress_1,
+    time_a_diet_1 = Time_A_diet_1,
+    time_a_other_1 = Time_A_other_1
+  )
+
+# check
+dim(data)
+str(data)
+summary(data)
+
+
+
+```
+## 2. Check participant IDs
+
+```{r check ID}
+
+#look for na, blank, duplicates
+summary(data$id)
+# we have 1 duplicate, 1 NA, 0 blanks
+
+
+#inspect records with missing or blank IDs
+missingID <- which(is.na(data$id))
+
+#remove the known empty record with no ID, then check the row count
+#remove NA
+data <- data[!is.na(data$id),]
+
+#check again
+missingID <- which(is.na(data$id))
+data[missingID,]
+```
+
+## 3. recode Political beliefs category variable
+
+```{r political beliefs category recode}
+
+# codebook: "1=Far left; 2=Center left; 3=Center; 4=Center right; 5=Far right."
+
+
+#turn cot_politics into a factor with labels 1=Far left; 2=Center left; 3=Center; 4=Center right; 5=Far right.
+
+table(data$cot_politics, useNA="ifany")
+
+data$cot_politics <- factor(data$cot_politics,
+                         levels = c(1:5),
+                         labels = c("far_left", "center_left", "center", "center_right", "far_right"))
+
+```
+
+## 4. Validate: Self-perceived Physical attractiveness (self_physatt, scale 1-11)
+
+
+```{r}
+
+# self_physatt
+# "1–11 relative rating: 1=Very low, 6=Average, 11=Very high. Intermediate categories use percentile anchors.
+# NA indicates a missing value unless a different rule is stated here."
+
+# check variable
+summary(data$self_physatt)
+# min 1, max 11 = good
+# bunch of NAs
+
+```
+
+
+## 5. Validate: Importance of looking attractive (attract_importance_1, scale 1-9)
+
+```{r}
+
+# attract_importance_1
+# "1 - not at all important - 9 - extremely important
+# NA indicates a missing value unless a different rule is stated here."
+
+# check variable
+summary(data$attract_importance_1)
+# min 1, max 9 = good
+# bunch of NAs
+
+
+```
+
+## 6. Daily time spent enhancing appearance  (composite variable, sum of 8 scales)
+
+```{r app_enh}
+#group all 8 appearance enhancing (app_enh) time variables
+
+colnames(data)
+              
+summary(data$time_a_makeup_1)
+summary(data$time_a_hyg_1)
+summary(data$time_a_cosm_1)
+summary(data$time_a_exercise_1)
+summary(data$time_a_hair_1)
+summary(data$time_a_dress_1)
+summary(data$time_a_diet_1)
+summary(data$time_a_other_1)
+# all looks good
+               
+# create a vector with names of columns
+
+###JK: Diet is listed twice, and the other-activities item is missing. ###
+# Replace the variable list below with the eight different items:
+# app_enh_vars <- c(
+#   "time_a_makeup_1", "time_a_hyg_1", "time_a_cosm_1",
+#   "time_a_exercise_1", "time_a_hair_1", "time_a_dress_1",
+#   "time_a_diet_1", "time_a_other_1"
+# )
+# Also replace the repeated summary(data$time_a_diet_1) above with summary(data$time_a_other_1).
+# After correcting the list, rerun the calculations and update the row counts in your comments.
+###  End of comment ###
+
+app_enh_vars <- c("time_a_makeup_1","time_a_hyg_1","time_a_cosm_1",
+                  "time_a_exercise_1", "time_a_hair_1","time_a_dress_1",
+                  "time_a_diet_1", "time_a_other_1")
+
+
+#see summary of variables
+# give that vector to df and ask for summary of those values
+summary(data[,app_enh_vars])
+
+###JK: Use the item names for these checks rather than columns 4:11. ###
+# Columns 4:11 include self_physatt and leave out time_a_other_1, so they are not the eight time items.
+# The named checks already above and below are the appropriate ones once app_enh_vars is corrected:
+# summary(data[, app_enh_vars])
+# colSums(is.na(data[, app_enh_vars]))
+# You can remove the below check using 4:11.
+###  End of comment ###
+
+
+#count NAs
+colSums(is.na(data[,app_enh_vars]))
+
+
+# calculate total score; leave the total NA if any item is missing
+# create new column called app_enh_total
+data$app_enh_total <- rowSums(data[app_enh_vars], na.rm=F)
+
+# if I make NAs in my individual variables make the total = NA, i lose a LOT of data, see below:
+# count NA values
+sum(is.na(data$app_enh_total))
+# 109540
+# count NOT NA values 
+sum(!is.na(data$app_enh_total))
+# 7753
+
+###JK: I agree that missing responses should not automatically become zero, but partial sums still need careful interpretation. ###
+# Someone reporting 30 minutes on one activity and leaving the rest blank gets the same score as someone reporting a total of 30 minutes across all eight activities.
+# We do not know how much time the first person spent on the unanswered activities, so those scores do not describe the same amount of information.
+# Your later code correctly returns NA when every item is missing, but it still sums different numbers of answered items for other participants.
+# After correcting app_enh_vars, check how many items each person answered:
+data$app_enh_answered <- rowSums(!is.na(data[, app_enh_vars]))
+table(data$app_enh_answered)
+# One straightforward option is to require all eight items:
+data$app_enh_total <- rowSums(data[, app_enh_vars], na.rm = FALSE)
+# If you choose that option, replace the later na.rm=TRUE calculations and mutate() block so they do not overwrite this score.
+# If you keep partial sums instead, explain that they are sums of reported activities, not necessarily total daily appearance time, and state this rule in the codebook.
+###  End of comment ###
+
+# 
+data$app_enh_answered <- rowSums(!is.na(data[, app_enh_vars]))
+
+# In conversation with John, we decided to change my approach
+# Before I still calculated a sum score for app_enh_total, when there was NA in
+# any of the 8 scores that the app_enh_total score is a composite of.
+# Now: 
+# All eight responses are required; if any item is missing, the score is NA.
+# This removes a large chunk of my data, but improves data quality.
+
+data$app_enh_total <- rowSums(data[, app_enh_vars], na.rm = FALSE)
+
+```
+
+## 7. create h1 dataframe
+
+H1 One categorical IV – continuous DV prediction
+
+Political beliefs (cat = left to right in 5 steps) 
+effect on 
+Physical attractiveness (scale = 11 point rating) 
+
+```{r h1 data frame}
+
+# make h1_data with "id", "cot_politics", "self_physatt"
+
+
+# code to remove all rows with NAs
+h1_data <- na.omit(data[c("id", "cot_politics", "self_physatt")])
+
+
+# plot
+boxplot(self_physatt ~ cot_politics, data = h1_data)
+
+```
+
+
+## 8. create h2 dataframe
+
+H2 One continuous-continuous prediction
+
+Importance of looking attractive (Attract_importance_1, scale 1-9)
+positive effect on
+Daily time spent enhancing appearance  (composite variable, sum of 8 scales)
+
+```{r h2 data frame}
+
+# code to remove all rows with NAs
+h2_data <- na.omit(data[c("id", "attract_importance_1", "app_enh_total")])
+
+
+
+# plot
+boxplot(app_enh_total ~ attract_importance_1, data = h2_data)
+
+```
+
+## 9. Check the final tables
+
+```{r}
+#check rows, columns, types, and missing values in h1_data
+#one row per participant, one column per variable
+dim(h1_data)
+str(h1_data)
+head(h1_data) # this only works for columns
+colSums(is.na(h1_data)) # kinda useless
+table(h1_data$cot_politics,useNA="ifany")
+range(h1_data$self_physatt, na.rm = TRUE) # have to na.rm = t because i have NA
+sum(duplicated(h1_data$id)) 
+
+#repeat the checks for h2_data; both scores should be within 1-7
+dim(h2_data)
+str(h2_data)
+head(h2_data)# this only works for columns
+colSums(is.na(h2_data))
+range(h2_data$attract_importance_1, na.rm = TRUE) # have to na.rm = t because i have NA
+range(h2_data$app_enh_total, na.rm = TRUE) # have to na.rm = t because i have NA
+sum(duplicated(h2_data$id))
+```
+
+## 10. Add labels and generate codebooks
+
+The descriptions come from the original codebook and our scoring decisions.
+`compact_codebook()` adds summaries from the actual data. Knit the Rmd to
+display the formatted codebooks.
+
+```{r}
+#add a description to each h1_data column, in column order
+#include the source codes, meaning, and units
+var_label(h1_data) <- c(
+  "id: Unique participant ID",
+  "cot_politics: self-reported political belief, original codes 1=Far left; 2=Center left; 3=Center; 4=Center right; 5=Far right ; now stored as a factor",
+  "self_physatt: Self-rating of physical attractiveness: scale from 1 - 11 (1=Very low, 6=Average, 11=Very high)"
+)
+
+#add a description to each h2_data column, in column order
+#include response anchors and the commitment scoring rule
+###JK: Update the appearance-time description to match your corrected items and chosen missing-data rule. ###
+# The current description repeats diet and leaves out other activities, just like the item list above.
+# You can replace the label for app_enh_total with the following description, then add one of the missing-data sentences below to that same label:
+# "Sum of reported time on makeup, hygiene, cosmetics, exercise, hair, dress, diet, and other appearance activities, in minutes. Each item uses 360 to represent six hours or more."
+# If requiring all eight items: "All eight responses are required; if any item is missing, the score is NA."
+# If keeping partial sums: "Available responses are summed; if all eight items are missing, the score is NA. Scores may be based on different numbers of answered items."
+###  End of comment ###
+
+var_label(h2_data) <- c(
+  "id: Unique participant ID",
+  "attract_importance_1: Self reported importance of own attractivness: scale from 1-9 (1 - not at all important - 9 - extremely important)",
+  "app_enh_total - Daily time spent enhancing appearance (in minutes): Composite score, sum of time_a_makeup_1,time_a_hyg_1,time_a_cosm_1, time_a_exercise_1, time_a_hair_1,time_a_dress_1, time_a_diet_1, time_a_diet_1; each individual variable having a max. value of 360 minutes. All eight responses are required; if any item is missing, the score is NA."
+)
+```
+
+H1 includes participants with an ID, a valid political belief category, and a score on for self rating of physical attractiveness from 1 -11. Factor level numbers in the generated table are internal R positions, not the original survey codes.
+
+```{r h1_codebook}
+#generate the h1Data codebook
+compact_codebook(h1_data)
+
+```
+
+H2 includes participants with an ID,  Self reported importance of own attractivness: scale from 1-9, and Daily time spent enhancing appearance (in minutes).
+
+```{r h2_codebook}
+#generate the h2Data codebook
+compact_codebook(h2_data)
+```
+
+## 11. Save the final tables
+
+```{r save}
+#create data/processed_data if needed
+dir.create("data/processed_data",recursive=T,showWarnings=F)
+
+#save h1Data and h2Data without an extra row-number column
+write.csv(h1_data,"data/processed_data/practice_h1.csv",row.names=F)
+write.csv(h2_data,"data/processed_data/practice_h2.csv",row.names=F)
+
+#read the files back and confirm their dimensions
+h1_saved <- read.csv("data/processed_data/practice_h1.csv")
+h2_saved <- read.csv("data/processed_data/practice_h2.csv")
+dim(h1_saved)
+dim(h2_saved)
+```
+
