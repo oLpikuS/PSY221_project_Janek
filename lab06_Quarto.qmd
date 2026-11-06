@@ -1,0 +1,156 @@
+---
+title: "Mate Preferences and Relationship Commitment"
+author: "John Kim"
+format:
+  html:
+    toc: true
+    code-fold: true
+execute:
+  echo: true
+editor: 
+  markdown: 
+    wrap: 72
+editor_options: 
+  chunk_output_type: console
+---
+
+Above is telling R how to format the file John added: toc: true - table
+of contents code-fold: true - able to fold and unfold code chunks
+
+echo: true - show output of my code chunks
+
+```{r}
+#| label: load-data
+#| include: false
+
+# naming code chunk
+# include: false, it will run the code but not show the running code, but only the output 
+
+# I can also put it in the {r} above?
+
+```
+
+"\#" this create a big title "\###" more hashtags, smaller title text
+
+export the quarto - hit render up in the task bar thing
+
+```{r}
+#| label: load-data
+#| include: false
+library(ggplot2)
+library(ggrain)
+
+h1Data <- read.csv("data/processed_data/practice_h1.csv")
+h1Data$Sex_birth <- factor(h1Data$Sex_birth,
+                           levels = c("Male", "Female", "Intersex"))
+h2Data <- read.csv("data/processed_data/practice_h2.csv")
+```
+
+## Hypothesis 1
+
+Points allocated to a partner's physical attractiveness differ by sex at
+birth.
+
+### Variables and descriptive statistics
+
+- **Sex at birth (`Sex_birth`):** A categorical variable with three
+  groups: Male, Female, and Intersex.
+- **Importance of partner physical attractiveness
+  (`preference_imp_physat`):** Points allocated to physical
+  attractiveness from a total budget of 30 points across six partner
+  characteristics. Higher values indicate greater relative importance.
+
+"\*\*" makes text bold "\`\`" will show things in a more "code" way
+
+```{r}
+#| label: h1-descriptives
+# Count respondents in each group.
+table(h1Data$Sex_birth)
+
+# Summarize attractiveness points separately for each group.
+by(h1Data$preference_imp_physat, h1Data$Sex_birth, summary)
+# by function lets me put summary by groups 
+# by works with table etc as well
+
+```
+
+### Graph
+
+@fig-attractiveness shows the distribution of points by sex at birth.
+The half-violin shows the shape of the distribution, the box summarizes
+the median and quartiles, and the dots represent individual responses.
+
+@fig-attractiveness links to the code chunk in this case to #\| label:
+fig-attractiveness below
+
+```{r}
+#| label: fig-attractiveness
+#| fig-cap: "Points allocated to a partner's physical attractiveness, by sex at birth."
+#| fig-width: 8
+#| fig-height: 5
+
+# above I can adjust width and height of figure and figure description! 
+
+ggplot(h1Data, aes(x = Sex_birth, y = preference_imp_physat,
+                   fill = Sex_birth)) +
+  geom_rain(alpha = 0.5, point.args = list(alpha = 0.04, size = 0.6)) +
+  labs(x = "Sex at birth", y = "Points allocated to physical attractiveness") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## H2. Confidence in finding a new partner and commitment
+
+Confidence in finding a new partner is associated with relationship
+commitment.
+
+### Variables and descriptive statistics
+
+- **Confidence in finding a new partner (`qoa`):** A single item about
+  finding another appealing partner if the current relationship ended.
+  Responses range from 1 (Strongly disagree) to 7 (Strongly agree).
+- **Relationship commitment (`commitment`):** The mean of available
+  responses to `prqc_4`, `prqc_5`, and `prqc_6`. Each item ranges from 1
+  (Not at all) to 7 (Extremely); higher scores indicate greater
+  commitment.
+
+This dataset includes respondents who were dating, in a committed
+relationship, or married.
+
+```{r}
+#| label: h2-descriptives
+summary(h2Data[, c("qoa", "commitment")])
+```
+
+### Graph
+
+@fig-commitment shows the relationship between confidence and
+commitment. Points are jittered to make overlapping responses easier to
+see; the recorded scores are unchanged. The line summarizes the linear
+trend.
+
+```{r}
+#| label: fig-commitment
+#| fig-cap: "Confidence in finding a new partner and relationship commitment."
+#| fig-width: 8
+#| fig-height: 5
+
+ggplot(h2Data, aes(x = qoa, y = commitment)) +
+  geom_jitter(width = .12, height = .04, alpha = .04, size = .6) +
+  geom_smooth(method = "lm") +
+  labs(x = "Confidence in finding a new partner (1–7)",
+       y = "Relationship commitment (1–7)") +
+  theme_minimal()
+```
+
+### Observed trend
+
+```{r}
+#| label: correlation
+r <- cor(h2Data$qoa, h2Data$commitment, use = "complete.obs")
+round(r, 2)
+```
+
+The correlation was `{r} round(r, 2)`, indicating a weak negative
+association. Respondents who reported more confidence in finding a new
+partner tended to report lower commitment.
