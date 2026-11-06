@@ -63,7 +63,7 @@ by(h1$self_physatt, h1$cot_politics, summary)
 
 ```
 
-#fig-distr shows the distribution of observations of political beliefs.
+@fig-distr shows the distribution of observations of political beliefs.
 
 ```{r}
 #| label: fig-distr
