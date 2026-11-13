@@ -65,6 +65,10 @@ h1_box
 Plot 1 violin
 
 ```{r}
+###JK: Update the labels. ###
+# The violin and raincloud also plot cot_politics and self_physatt, but their labels still refer to sex and partner-attractiveness points.
+# In both plots, use labs(x = "Political beliefs", y = "Self-rated physical attractiveness", title = "Self-rated attractiveness by political beliefs").
+###  End of comment ###
 
 h1_violin <- ggplot(data = h1, 
                   aes(x = cot_politics,
