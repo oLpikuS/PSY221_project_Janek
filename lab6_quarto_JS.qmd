@@ -1,0 +1,187 @@
+---
+title: "PSY221A Lab 6 - Political Beliefs, Attractiveness and Time Spent Enhancing Appearances"
+author: "Janek Stahlberg"
+format:
+  html:
+    toc: true
+    code-fold: true
+execute:
+  echo: true
+editor: 
+  markdown: 
+    wrap: 72
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: load-data
+#| include: false
+library(ggplot2)
+
+h1 <- read.csv("data/processed_data/practice_h1.csv")
+h2 <- read.csv("data/processed_data/practice_h2.csv")
+
+```
+
+small data fix
+
+```{r}
+
+# I realized that my boxplot labelled the x-axis wrong, so I need to changes the levels in my cot_politics variable
+# For the sake of simplicity, I will just do this here.
+
+h1$cot_politics <- factor(h1$cot_politics, levels = c("far_left", "center_left", "center", "center_right", "far_right"))
+
+```
+
+
+## Hypothesis 1
+
+Self-reported physical attractivness differs depending on individuals
+political beliefs.
+
+### Variables and descriptive statistics
+
+- **Political beliefs (`cot_politics`):** Categorical variable with
+  three groups: "far_left", "center_left", "center", "center_right",
+  far_right".
+- **Physical attractivenes (`self_phsysatt`):** Numerical variable with
+  self reported point rating of individuals physical attractivness on a
+  scale from 1 to 11, where 1 is very low and 11 is very high.
+
+```{r}
+#| label: h1-descriptives
+# Count respondents in each group.
+table(h1$cot_politics)
+
+# Summarize attractiveness points seperately in each group.
+by(h1$self_physatt, h1$cot_politics, summary)
+
+```
+
+### Graph
+
+@fig-polatt shows the distribution shows the distribution of
+self-reported physical attractivness score by political beliefs. The
+boxplot shows the median and quartiles with a central box, while the
+whiskers extend to the minimum and maximum values within a specified
+range, and individual points plotted beyond them show the outliers.
+
+```{r}
+#| label: fig-polatt
+#| fig-cap: "Self Reported Physical Attractiveness and Political Beliefs"
+#| fig-width: 8
+#| fig-height: 5
+
+# plot
+ggplot(data = h1, aes(x = cot_politics,
+                   y = self_physatt,
+                   fill = cot_politics)) +
+         geom_boxplot(width = .4) + 
+         labs(x = "Political Beliefs", 
+         y = "(Self reported) Physical Attractiveness Scale",, 
+         title = "Self Reported Physical Attractiveness and Political Beliefs") +
+         scale_x_discrete(labels = c("Far Left", "Center Left", "Center", "Center Right", "Far Right")) +
+         guides(fill = "none") 
+
+```
+
+### Observed trend
+
+summary(h1)
+
+```{r}
+#| label: h1_anovas
+
+model <- aov(self_physatt ~ cot_politics, data = h1)
+summary(model)
+
+# Pairwise comparisons
+TukeyHSD(model)
+
+
+```
+
+The ANOVA results indicate a statistically significant difference in
+self-reported physical attractiveness across political belief groups
+(F(4, 83139) = 95.58, p \< .001). Tukey post-hoc comparisons show most
+political beliefs group differ significantly from each other and that
+far-right respondents tend to report higher physical attractiveness than
+all other groups, while far-left and center-left respondents do not
+differ significantly. Overall, individuals with right-wing beliefs tend
+to report higher physical attractiveness.
+
+## Hypothesis 2
+
+Importance of looking attractive has a positive effect on daily time
+spent enhancing appearance .
+
+### Variables and descriptive statistics
+
+- **Importance of Own Attractivness (`Attract_importance_1`):**
+  Numerical variable with self reported importance of own attractivness
+  on a scale from 1 to 9, where 1 is not at all important and 9 is
+  extremely important.
+- **Daily time spent enhancing appearance (`app_enh_total`):** Composite
+  numerical score, sum of 8 variables of time spent on: make up
+  (`Time_A_makeup_1`), hygiene (`Time_A_hyg_1`), cosmetics
+  (`Time_A_cosm_1`), exercise (`Time_A_exercise_1`), hair
+  (`Time_A_hair_1`), dressing up (`Time_A_dress_1`), diet
+  (`Time_A_diet_1`), other appearance enhancing activities
+  (`Time_A_other_1`). Score is the sum of minutes spent per day for each
+  activity. Higher value indicate higher overall daily time spent
+  enhancing appearances. Item value 360 represents 6 hours or more.
+
+```{r}
+#| label: h2-descriptives
+# don't show ID here
+summary(h2[, c("attract_importance_1", "app_enh_total")])
+
+```
+
+### Graph
+
+@fig-attenh illustrates the relationship between the time spent
+enhancing an individual's appearance and the importance of their own
+physical appearance. The data are visualized using a scatter plot paired
+with a linear regression line that summarizes the overall trend.
+Individual data points are jittered to prevent overlapping and improve
+readability, though the underlying recorded scores remain unchanged.
+
+```{r}
+#| label: fig-attenh
+#| fig-cap: "Time Spent Enhancing Appearance in Relation to Importance of Appearance"
+#| fig-width: 8
+#| fig-height: 5
+
+#Scatter Plot with line
+ggplot(data = h2, 
+                  aes(x = attract_importance_1,
+                      y = app_enh_total)) +
+                         geom_jitter(width=.12, height=.1, alpha=.2, size = .6)  +
+        labs(x = "Reported Importance Of Own Attractivness", 
+        y = "Composite Score of Daily Time Spent Enhancing Appearance (min)", 
+        title = "Time Spent Enhancing Appearance in Relation to Importance of Appearance") +
+  geom_smooth(method="lm")
+
+
+
+```
+
+### Observed trend
+
+```{r}
+#| label: correlation
+r <- cor(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
+round(r,2)
+
+
+```
+
+A correlation coefficient of `{r} round(r, 2)` indicates a weak,
+positive linear relationship between the two variables. Respondents who
+reported more confidence in finding a new partner tended to report lower
+commitment. Individuals who place greater importance on their physical
+appearance tend to spend slightly more time enhancing it, though this
+tendency is small.
