@@ -179,6 +179,10 @@ round(r,2)
 
 ```
 
+###JK: Keep the H2 interpretation focused on your two appearance variables. ###
+# Remove the sentence about confidence in finding a new partner and commitment. Your H2 is about importance of appearance and time spent enhancing appearance, and the following sentence already describes that association correctly.
+###  End of comment ###
+
 A correlation coefficient of `{r} round(r, 2)` indicates a weak,
 positive linear relationship between the two variables. Respondents who
 reported more confidence in finding a new partner tended to report lower
