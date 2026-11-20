@@ -367,6 +367,23 @@ Figure&nbsp;3: Time Spent Enhancing Appearance in Relation to Importance of Appe
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.13</code></pre>
 </div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(h2<span class="sc">$</span>attract_importance_1, h2<span class="sc">$</span>app_enh_total, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  h2$attract_importance_1 and h2$app_enh_total
+t = 11.357, df = 7636, p-value &lt; 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.1067590 0.1508684
+sample estimates:
+      cor 
+0.1288774 </code></pre>
+</div>
 </div>
 <p>A correlation coefficient of 0.13 indicates a weak, positive linear relationship between the two variables. Respondents who reported more confidence in finding a new partner tended to report lower commitment. Individuals who place greater importance on their physical appearance tend to spend slightly more time enhancing it, though this tendency is small.</p>
 </section>

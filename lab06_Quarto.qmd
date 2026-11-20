@@ -40,6 +40,8 @@ export the quarto - hit render up in the task bar thing
 library(ggplot2)
 library(ggrain)
 
+getwd()
+
 h1Data <- read.csv("data/processed_data/practice_h1.csv")
 h1Data$Sex_birth <- factor(h1Data$Sex_birth,
                            levels = c("Male", "Female", "Intersex"))
@@ -148,7 +150,11 @@ ggplot(h2Data, aes(x = qoa, y = commitment)) +
 ```{r}
 #| label: correlation
 r <- cor(h2Data$qoa, h2Data$commitment, use = "complete.obs")
+
 round(r, 2)
+
+cor.test(h2Data$qoa, h2Data$commitment, use = "complete.obs")
+
 ```
 
 The correlation was `{r} round(r, 2)`, indicating a weak negative

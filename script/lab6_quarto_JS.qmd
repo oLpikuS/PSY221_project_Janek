@@ -205,6 +205,8 @@ ggplot(data = h2,
 r <- cor(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
 round(r,2)
 
+cor.test(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
+
 
 ```
 
