@@ -47,7 +47,7 @@ political beliefs.
 ### Variables and descriptive statistics
 
 - **Political beliefs (`cot_politics`):** Categorical variable with
-  three groups: "far_left", "center_left", "center", "center_right",
+  five groups: "far_left", "center_left", "center", "center_right",
   far_right".
 - **Physical attractivenes (`self_phsysatt`):** Numerical variable with
   self reported point rating of individuals physical attractivness on a
@@ -210,9 +210,5 @@ cor.test(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
 
 ```
 
-A correlation coefficient of `{r} round(r, 2)` indicates a weak,
-positive linear relationship between the two variables. Respondents who
-reported more confidence in finding a new partner tended to report lower
-commitment. Individuals who place greater importance on their physical
-appearance tend to spend slightly more time enhancing it, though this
-tendency is small.
+
+A correlation coefficient of `{r} round(r, 2)` indicates a weak, positive linear relationship between the importance of attractiveness and time spent enhancing appearance. The correlation is statistically significant (r = 0.13, t(7636) = 11.36, p < .001, 95% CI [0.107, 0.151]). Individuals who place greater importance on their physical appearance tend to spend slightly more time enhancing it, although this relationship is small.
