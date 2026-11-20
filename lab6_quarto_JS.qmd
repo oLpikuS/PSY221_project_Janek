@@ -14,6 +14,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+###JK: Good work! Nothing to revise :) ###
+
 ```{r}
 #| label: load-data
 #| include: false
@@ -182,8 +184,6 @@ cor.test(h2$attract_importance_1, h2$app_enh_total, use = "complete.obs")
 ```
 
 A correlation coefficient of `{r} round(r, 2)` indicates a weak,
-positive linear relationship between the two variables. Respondents who
-reported more confidence in finding a new partner tended to report lower
-commitment. Individuals who place greater importance on their physical
+positive linear relationship between the two variables. Individuals who place greater importance on their physical
 appearance tend to spend slightly more time enhancing it, though this
 tendency is small.
